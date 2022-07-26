@@ -1,8 +1,8 @@
-mod app_use;
+mod app;
 
 use gtk::prelude::*;
 use gtk::Application;
-use app_use::handler;
+use app::handler;
 
 fn main() {
     let app = Application::builder()
