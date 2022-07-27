@@ -1,4 +1,5 @@
 mod app;
+mod utils;
 
 use gtk::prelude::*;
 use gtk::Application;
