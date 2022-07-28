@@ -36,32 +36,28 @@ pub fn handler(app: &Application, shell: bool) {
         }
 
         let list = ListBox::new();
-        
+
         for app in &get("/usr/share/applications") {
             add(app, &list);
         }
+        
+        list.connect_key_press_event(| list, event | {
+            if event.keycode() == Some(36) {
+                select(list, &get("/usr/share/applications"));
 
-        list.connect_row_selected(| select, _ | {
-            let label: String = select
-                .selected_row()
-                .expect("Failed to get row")
-                .child()
-                .expect("Failed to get child")
-                .property_value("label")
-                .get()
-                .unwrap();
+            }
 
-            let app = &get("/usr/share/applications")
-                .into_iter()
-                .filter(| i | i.name == label.split(" ").collect::<Vec<&str>>()[0])
-                .collect::<Vec<App>>()[0];
+            Inhibit(false)
+        });
 
-            let args = app
-                .exec
-                .split(" ")
-                .collect::<Vec<&str>>();
-            
-            run(args);
+        list.connect_button_press_event(| list, event| {
+            if event.button() == 1 {
+                list.connect_row_selected(| list, _ | {
+                    select(list, &get("/usr/share/applications"));
+                });
+            }
+
+            Inhibit(false)
         });
 
         let scrollable = ScrolledWindow::builder()
@@ -124,4 +120,28 @@ fn add(app: &App, list: &gtk::ListBox) {
         list.add(&Label::new(Some(&app.name)));
 
     }
+}
+
+fn select(list: &ListBox, apps: &Vec<App>) {
+    let label: String = list
+        .selected_row()
+        .expect("Failed to get row")
+        .child()
+        .expect("Failed to get child")
+        .property_value("label")
+        .get()
+        .unwrap();
+
+    let app = &apps
+        .clone()
+        .into_iter()
+        .filter(| i | i.name == label.split(" ").collect::<Vec<&str>>()[0])
+        .collect::<Vec<App>>()[0];
+
+    let args = app
+        .exec
+        .split(" ")
+        .collect::<Vec<&str>>();
+    
+    run(args);
 }
