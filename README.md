@@ -5,7 +5,7 @@
 
 ## ❗️ Install:
 
-** This program have Linux as target system, we don't give support for any other system**
+**This program have Linux as target system, we don't give support for any other system**
 
 ```bash
 git clone https://github.com/z3oxs/rough.git && cd rdl
