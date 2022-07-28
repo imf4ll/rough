@@ -24,6 +24,8 @@ pub fn get(path: &str) -> Vec<App> {
             .collect::<Vec<&str>>();
 
         for i in &raw_lines {
+            if i.contains("Desktop Action") { break }
+
             if i.starts_with("Name=") {
                 app.name = i
                     .split("=")
