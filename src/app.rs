@@ -2,13 +2,13 @@ use std::process::{Command, exit};
 
 use gtk::prelude::*;
 use gtk::{Application, ApplicationWindow, Entry, Box, Orientation, ListBox, Label, ScrolledWindow};
-use crate::utils::{types::App, get_apps::get};
+use crate::utils::{types::{App, Config}, get_apps::get};
 
-pub fn handler(app: &Application, shell: bool) {
+pub fn handler(app: &Application, shell: bool, config: Config) {
     app.connect_activate(move | app | {
         let window = ApplicationWindow::builder()
             .application(app)
-            .default_width(700)
+            .default_width(config.window_width)
             .resizable(false)
             .has_focus(true)
             .window_position(gtk::WindowPosition::Center)
@@ -62,7 +62,7 @@ pub fn handler(app: &Application, shell: bool) {
 
         let scrollable = ScrolledWindow::builder()
             .hscrollbar_policy(gtk::PolicyType::Never)
-            .min_content_height(240)
+            .min_content_height(config.box_height)
             .child(&list)
             .build();
 

@@ -1,5 +1,6 @@
 mod app;
 mod utils;
+mod config;
 
 use gtk::prelude::*;
 use gtk::Application;
@@ -16,12 +17,14 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
+
+    let config = config::parse();
    
     let app = Application::builder()
         .application_id("com.z3oxs.rough")
         .build();
 
-    handler(&app, args.shell);
+    handler(&app, args.shell, config);
 
     app.run_with_args(&[""]);
 }
