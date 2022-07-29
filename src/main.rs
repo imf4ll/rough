@@ -2,6 +2,7 @@ mod app;
 mod utils;
 mod config;
 mod get_apps;
+mod styling;
 
 use gtk::prelude::*;
 use gtk::Application;
