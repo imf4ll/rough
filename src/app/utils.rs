@@ -15,7 +15,7 @@ pub fn run(args: Vec<&str>) {
 
 pub fn add(app: &App, list: &ListBox) {
     if app.generic != "" {
-        list.add(&Label::new(Some(&format!("{} ({})", &app.name, &app.generic))));
+        list.add(&Label::new(Some(&format!("{} [{}]", &app.name, &app.generic))));
 
     } else {
         list.add(&Label::new(Some(&app.name)));
@@ -36,13 +36,13 @@ pub fn select(list: &ListBox, apps: &Vec<App>) {
     let app = &apps
         .clone()
         .into_iter()
-        .filter(| i | i.name == label.split(" ").collect::<Vec<&str>>()[0])
+        .filter(| i | i.name == label.split(" [").collect::<Vec<&str>>()[0])
         .collect::<Vec<App>>()[0];
 
     let args = app
         .exec
         .split(" ")
         .collect::<Vec<&str>>();
-    
+
     run(args);
 }
