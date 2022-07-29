@@ -1,4 +1,16 @@
 {
-    "window_width": 600,
-    "box_height": 200
+    "window": {
+        "width": 600,
+        "border_width": 6,
+        "border_color": "#252525"
+    },
+    "container": {
+        "max_height": 200
+    },
+    "textbox": {
+        "margin": 0
+    },
+    "list": {
+        "margin_top": 6
+    }
 }
