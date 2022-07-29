@@ -60,21 +60,56 @@ On this mode, you can run apps and shell commands directly
 
 ## ⚙️ Configuration:
 
-Default template: "config.json"
+Default template: "YOURHOME/.config/rough/config.json"
 ```json
 {
-    "window_width": 600,
-    "box_height": 200
+    "window": {
+        "width": 600,
+        "border_width": 6,
+        "border_color": "#252525"
+    },
+    "container": {
+        "max_height": 200
+    },
+    "textbox": {
+        "margin": 0
+    },
+    "list": {
+        "margin_top": 6
+    }
 }
 ```
 
 &nbsp;
 <div align="center">
 
-### Available options:
+## Available options:
+### Window
 | Option | Description |
 |--------|-------------|
-| window_width | Width of the main window |
-| box_height | Height of the scrollable box |
+| width | Set window width |
+| border_width | Set window border width |
+| border_color | Set window border color (like in CSS) |
+
+&nbsp;
+
+### Container (ScrolledWindow)
+| Option | Description |
+|--------|-------------|
+| max_height | Set max height of container |
+
+&nbsp;
+
+### Textbox (Entry)
+| Option | Description |
+|--------|-------------|
+| margin | Set margin (all sides) of textbox |
+
+&nbsp;
+
+### List (ListBox)
+| Option | Description |
+|--------|-------------|
+| margin_top | Set margin-top of the list |
 
 </div>
