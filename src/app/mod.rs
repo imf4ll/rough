@@ -28,7 +28,21 @@ pub fn handler(app: &Application, shell: bool, config: Config) {
             .decorated(false)
             .border_width(config.window.border_width as u32)
             .build();
-        
+
+        if config.window.opacity < 1.0 {
+            window.set_app_paintable(true);
+
+            set_visual(&window, None);
+
+            window.connect_screen_changed(set_visual);
+            
+            let config_clone = config.clone();
+
+            window.connect_draw(move | window, ctx | {
+                draw(window, ctx, &config_clone)
+            });
+        }
+
         window
             .style_context()
             .add_provider(&provider(&config), gtk::STYLE_PROVIDER_PRIORITY_APPLICATION);
@@ -37,9 +51,15 @@ pub fn handler(app: &Application, shell: bool, config: Config) {
 
         let textbox = Entry::new();
 
+        textbox
+            .style_context()
+            .add_provider(&provider(&config), gtk::STYLE_PROVIDER_PRIORITY_APPLICATION);
+
         textbox.set_placeholder_text(Some("Type your command or app"));
         textbox.set_margin(config.textbox.margin);
+        textbox.set_app_paintable(true);
         textbox.set_vexpand(true);
+        textbox.set_xalign(0.5);
 
         if shell {
             textbox.connect_key_press_event(| textbox, event | {
@@ -58,6 +78,10 @@ pub fn handler(app: &Application, shell: bool, config: Config) {
         }
 
         let list = ListBox::new();
+
+        list
+            .style_context()
+            .add_provider(&provider(&config), gtk::STYLE_PROVIDER_PRIORITY_APPLICATION);
         
         list.connect_key_press_event(| list, event | {
             if event.keycode() == Some(36) {
