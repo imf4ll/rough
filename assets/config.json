@@ -2,15 +2,20 @@
     "window": {
         "width": 600,
         "border_width": 6,
-        "border_color": "#252525"
+        "border_color": "#252525",
+        "opacity": 1.0,
+        "background_color": "0, 0, 0",
+        "font_color": "#FFFFFF"
     },
     "container": {
         "max_height": 200
     },
     "textbox": {
-        "margin": 0
+        "margin": 0,
+        "transparent": false
     },
     "list": {
-        "margin_top": 6
+        "margin_top": 6,
+        "transparent": false
     }
 }

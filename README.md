@@ -66,16 +66,21 @@ Default template: "YOURHOME/.config/rough/config.json"
     "window": {
         "width": 600,
         "border_width": 6,
-        "border_color": "#252525"
+        "border_color": "#252525",
+        "opacity": 1.0,
+        "background_color": "0, 0, 0",
+        "font_color": "#FFFFFF"
     },
     "container": {
         "max_height": 200
     },
     "textbox": {
-        "margin": 0
+        "margin": 0,
+        "transparent": false
     },
     "list": {
-        "margin_top": 6
+        "margin_top": 6,
+        "transparent": false
     }
 }
 ```
@@ -90,6 +95,9 @@ Default template: "YOURHOME/.config/rough/config.json"
 | width | Set window width |
 | border_width | Set window border width |
 | border_color | Set window border color (like in CSS) |
+| opacity | If smaller than 1.0, will set a alpha on the background |
+| background_color | If transparent enabled, will be the background color (use values between 0 and 1, like "(0.40, 0.42, 0.54)") |
+| font_color | Set font color of entire application |
 
 &nbsp;
 
@@ -104,6 +112,7 @@ Default template: "YOURHOME/.config/rough/config.json"
 | Option | Description |
 |--------|-------------|
 | margin | Set margin (all sides) of textbox |
+| transparent | If window opacity smaller than 1.0, receive true or false to transparency |
 
 &nbsp;
 
@@ -111,5 +120,6 @@ Default template: "YOURHOME/.config/rough/config.json"
 | Option | Description |
 |--------|-------------|
 | margin_top | Set margin-top of the list |
+| transparent | If window opacity smaller than 1.0, receive true or false to transparency |
 
 </div>
