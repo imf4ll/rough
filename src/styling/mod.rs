@@ -1,13 +1,12 @@
+mod utils;
+
 use gtk::prelude::*;
 use gtk::CssProvider;
 use crate::utils::types::Config;
+use utils::create_css;
 
 pub fn provider(config: &Config) -> CssProvider {
-    let css = format!("
-        window {{
-            border: 1px solid {};
-        }}
-    ", config.window.border_color);
+    let css = create_css(config);
 
     let provider = gtk::CssProvider::new();
     
