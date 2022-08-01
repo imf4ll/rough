@@ -10,6 +10,7 @@ pub fn get(path: &str) -> Vec<App> {
             name: String::from(""),
             generic: String::from(""),
             exec: String::from(""),
+            icon: String::from(""),
         };
 
         let file_path = file
@@ -42,6 +43,13 @@ pub fn get(path: &str) -> Vec<App> {
 
             if i.starts_with("Exec=") {
                 app.exec = i
+                    .split("=")
+                    .collect::<Vec<&str>>()[1]
+                    .to_string();
+            }
+
+            if i.starts_with("Icon=") {
+                app.icon = i
                     .split("=")
                     .collect::<Vec<&str>>()[1]
                     .to_string();
