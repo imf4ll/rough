@@ -3,10 +3,15 @@ mod utils;
 use gtk::prelude::*;
 use gtk::CssProvider;
 use crate::utils::types::Config;
-use utils::create_css;
+use utils::*;
 
 pub fn provider(config: &Config) -> CssProvider {
-    let css = create_css(config);
+    let mut css: String = create_default_css(config);
+
+    if config.window.opacity < 1.0 {
+        css = create_transparent_css(config);
+    
+    }
 
     let provider = gtk::CssProvider::new();
     

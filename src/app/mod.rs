@@ -4,7 +4,7 @@ use std::process::exit;
 
 use gtk::prelude::*;
 use crate::utils::types::Config;
-use crate::get_apps::get;
+use crate::apps::get;
 use crate::app::utils::*;
 use crate::styling::provider;
 use gtk::{
@@ -17,7 +17,7 @@ use gtk::{
     ScrolledWindow
 };
 
-pub fn handler(app: &Application, shell: bool, config: Config) {
+pub fn build_app(app: &Application, shell: bool, config: Config) {
     app.connect_activate(move | app | {
         let window = ApplicationWindow::builder()
             .application(app)
@@ -27,6 +27,7 @@ pub fn handler(app: &Application, shell: bool, config: Config) {
             .window_position(gtk::WindowPosition::CenterAlways)
             .decorated(false)
             .border_width(config.window.border_width as u32)
+            .title("Rough")
             .build();
 
         if config.window.opacity < 1.0 {
@@ -109,6 +110,7 @@ pub fn handler(app: &Application, shell: bool, config: Config) {
 
         let container_clone = container.clone();
         let scrollable_clone = scrollable.clone();
+        let config_clone = config.clone();
 
         textbox.connect_changed(move | text | {
             if !format!("{:?}", container_clone.children()).contains("GtkScrolledWindow") {
@@ -129,7 +131,7 @@ pub fn handler(app: &Application, shell: bool, config: Config) {
                     i.name.to_lowercase().contains(&format!("{}", text.text().to_lowercase())) ||
                     i.exec.contains(&format!("{}", text.text().to_lowercase()))
                 )
-                .for_each(| i | add(&i, &list));
+                .for_each(| i | add(&i, &list, &config_clone));
 
             if text.text() == "" || list.children().len() == 0 {
                 container_clone.remove(&scrollable_clone);
