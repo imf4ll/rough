@@ -1,12 +1,13 @@
 mod app;
 mod utils;
 mod config;
-mod get_apps;
+mod apps;
 mod styling;
+mod tests;
 
 use gtk::prelude::*;
 use gtk::Application;
-use app::handler;
+use app::build_app;
 use clap::Parser;
 
 #[derive(Parser)]
@@ -26,7 +27,7 @@ fn main() {
         .application_id("com.z3oxs.rough")
         .build();
 
-    handler(&app, args.shell, config);
+    build_app(&app, args.shell, config);
 
     app.run_with_args(&[""]);
 }
