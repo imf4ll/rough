@@ -19,6 +19,7 @@ pub fn parse() -> Config {
             opacity: 1.0,
             background_color: String::from("255, 255, 255"),
             font_color: String::from("#FFFFFF"),
+            icons: true,
         },
         container: Container {
             max_height: 200,

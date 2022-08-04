@@ -26,34 +26,31 @@ pub fn run(args: Vec<&str>) {
     exit(0);
 }
 
-pub fn add(app: &App, list: &ListBox) {
-    let container = Box::new(Orientation::Horizontal, 0);
+pub fn add(app: &App, list: &ListBox, config: &Config) {
+    let container = Box::builder()
+        .orientation(Orientation::Horizontal)
+        .spacing(0)
+        .halign(Align::Center)
+        .build();
     
-    container.set_halign(Align::Center);
+    let image = Image::builder()
+        .icon_name(&app.icon)
+        .icon_size(IconSize::Button)
+        .build();
 
-    let image: Image;
-    let name: Label;
+    let mut name = Label::new(Some(&format!("{}", &app.name)));
 
     if app.generic != "" {
         name = Label::new(Some(&format!("{} [{}]", &app.name, &app.generic)));
     
-    } else {
-        name = Label::new(Some(&format!("{}", &app.name)));
-
     }
 
-    if app.icon != "" {
-        image = Image::new();
-
-        image.set_from_icon_name(Some(&app.icon), IconSize::Button);
-    
+    if config.window.icons {
         container.add(&image);
-        container.add(&name);
     
-    } else {
-        container.add(&name);
-
     }
+
+    container.add(&name);
 
     list.add(&container);
 }

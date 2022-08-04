@@ -25,6 +25,7 @@ pub struct Window {
     pub opacity: f64,
     pub background_color: String,
     pub font_color: String,
+    pub icons: bool,
 }
 
 #[derive(Deserialize, Debug, Clone)]
