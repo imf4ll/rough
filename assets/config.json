@@ -5,7 +5,8 @@
         "border_color": "#252525",
         "opacity": 1.0,
         "background_color": "0, 0, 0",
-        "font_color": "#FFFFFF"
+        "font_color": "#FFFFFF",
+        "icons": true
     },
     "container": {
         "max_height": 200
