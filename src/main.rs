@@ -1,14 +1,12 @@
 mod app;
 mod utils;
 mod config;
-mod apps;
 mod styling;
 mod tests;
 
-use gtk::prelude::*;
 use gtk::Application;
-use app::build_app;
 use clap::Parser;
+use app::App;
 
 #[derive(Parser)]
 #[clap(version, about = "A GTK based app launcher")]
@@ -22,12 +20,15 @@ fn main() {
     let args = Args::parse();
 
     let config = config::parse();
-   
-    let app = Application::builder()
-        .application_id("com.z3oxs.rough")
-        .build();
 
-    build_app(&app, args.shell, config);
+    let app = App {
+        app: Application::builder()
+            .application_id("com.z3oxs.rough")
+            .build(),
 
-    app.run_with_args(&[""]);
+        shell: args.shell,
+        config,
+    };
+
+    app.run();
 }
