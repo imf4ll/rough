@@ -306,10 +306,21 @@ impl App {
                 }
 
                 if i.starts_with("Exec=") {
-                    app.exec = i
+                    let mut exec = i
                         .split("=")
                         .collect::<Vec<&str>>()[1]
                         .to_string();
+
+                    if exec.contains("%") {
+                        let args = exec
+                            .split(" ")
+                            .collect::<Vec<&str>>();
+                        
+                        exec = args[..args.len() - 1]
+                            .join(" ");
+                    }
+
+                    app.exec = exec;
                 }
 
                 if i.starts_with("Icon=") {
