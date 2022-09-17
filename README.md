@@ -14,8 +14,6 @@ make install
 
 &nbsp;
 
-or check [releases section](https://github.com/z3oxs/rough/releases/)
-
 ## ❗️ Update:
 ```bash
 git clone https://github.com/z3oxs/rough.git && cd rough
