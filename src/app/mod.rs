@@ -7,6 +7,7 @@ use gtk::prelude::*;
 use crate::utils::types::Config;
 use crate::app::transparency::*;
 use crate::styling::Provider;
+use eval::eval;
 use gtk::{
     Application,
     ApplicationWindow,
@@ -25,6 +26,7 @@ pub struct App {
     pub app: Application,
     pub shell: bool,
     pub config: Config,
+    pub calc: bool,
 }
 
 impl App {
@@ -140,6 +142,27 @@ impl App {
                 }
 
                 list.foreach(| i | list.remove(i));
+
+                if self.calc && Self::is_calc_valid(text.text().as_str()) {
+                    let calc = Box::builder()
+                        .orientation(Orientation::Horizontal)
+                        .spacing(0)
+                        .halign(Align::Center)
+                        .build();
+
+                    match eval(text.text().as_str()) {
+                        Ok(_) => calc.add(
+                            &Label::new(Some(&format!("{}", eval(text
+                                .text()
+                                .as_str())
+                                .unwrap()
+                            )))
+                        ),
+                        Err(_) => {},
+                    }
+                    
+                    list.add(&calc);
+                }
 
                 Self::get_apps("/usr/share/applications")
                     .into_iter()
@@ -275,6 +298,7 @@ impl App {
                 generic: String::from(""),
                 exec: String::from(""),
                 icon: String::from(""),
+                calc: false,
             };
 
             let file_path = file
@@ -335,5 +359,21 @@ impl App {
         }
 
         apps
+    }
+
+    fn is_calc_valid(text: &str) -> bool {
+        text
+            .trim()
+            .replace(" ", "")
+            .bytes()
+            .all(| b | matches!(b, b'%'..=b'9'))
+        &&
+        !text
+            .bytes()
+            .all(| b | matches!(b, b'a'..=b'z'))
+        &&
+        !text
+            .bytes()
+            .all(| b | matches!(b, b'A'..=b'Z'))
     }
 }

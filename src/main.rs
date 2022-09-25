@@ -13,7 +13,11 @@ use app::App;
 struct Args {
     /// Run in shell mode
     #[clap(short, long, takes_value = false)]
-    shell: bool
+    shell: bool,
+
+    /// Calculator mode
+    #[clap(short, long, action)]
+    calc: bool,
 }
 
 fn main() {
@@ -28,6 +32,7 @@ fn main() {
 
         shell: args.shell,
         config,
+        calc: args.calc,
     };
 
     app.run();
