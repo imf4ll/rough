@@ -53,6 +53,7 @@ On this mode, you can run apps and shell commands directly
 | Option | Description |
 |--------|-------------|
 | -s/--shell | Run on shell mode |
+| -c/--calc  | Run on calculator mode |
 
 </div>
 
