@@ -6,7 +6,6 @@ pub struct App {
     pub generic: String,
     pub exec: String,
     pub icon: String,
-    pub calc: bool,
 }
 
 // CONFIGURATION
