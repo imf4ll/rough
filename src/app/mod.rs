@@ -8,6 +8,7 @@ use crate::utils::types::Config;
 use crate::app::transparency::*;
 use crate::styling::Provider;
 use eval::eval;
+use gtk::gdk::SELECTION_CLIPBOARD;
 use gtk::{
     Application,
     ApplicationWindow,
@@ -20,6 +21,7 @@ use gtk::{
     Image,
     IconSize,
     Align,
+    Clipboard,
 };
 
 pub struct App {
@@ -144,24 +146,39 @@ impl App {
                 list.foreach(| i | list.remove(i));
 
                 if self.calc && Self::is_calc_valid(text.text().as_str()) {
-                    let calc = Box::builder()
-                        .orientation(Orientation::Horizontal)
-                        .spacing(0)
-                        .halign(Align::Center)
-                        .build();
-
                     match eval(text.text().as_str()) {
-                        Ok(_) => calc.add(
-                            &Label::new(Some(&format!("{}", eval(text
-                                .text()
-                                .as_str())
-                                .unwrap()
-                            )))
-                        ),
+                        Ok(_) => {
+                            let container = Box::builder()
+                                .orientation(Orientation::Horizontal)
+                                .spacing(0)
+                                .halign(Align::Center)
+                                .build();
+
+                            let image = Image::builder()
+                                .icon_name("accessories-calculator")
+                                .icon_size(IconSize::Button)
+                                .build();
+
+                            container.add(&image);
+
+                            let calc = eval (
+                                text
+                                    .text()
+                                    .as_str()
+                            )
+                                .unwrap();
+
+                            container.add (
+                                &Label::new(Some(&format!("{calc}")))
+                            );
+
+                            if Self::contains_number(&format!("{calc}")) {
+                                list.add(&container);
+
+                            }
+                        },
                         Err(_) => {},
                     }
-                    
-                    list.add(&calc);
                 }
 
                 Self::get_apps("/usr/share/applications")
@@ -275,18 +292,27 @@ impl App {
             .get()
             .unwrap();
 
-        let app = &apps
-            .clone()
-            .into_iter()
-            .filter(| i | i.name == label.split(" [").collect::<Vec<&str>>()[0])
-            .collect::<Vec<crate::utils::types::App>>()[0];
+        if Self::contains_number(&label) {
+            let clipboard = Clipboard::get(&SELECTION_CLIPBOARD);
 
-        let args = app
-            .exec
-            .split(" ")
-            .collect::<Vec<&str>>();
+            clipboard.set_text(&label);
 
-        Self::exec(args);
+            std::process::exit(0);
+
+        } else {
+            let app = &apps
+                .clone()
+                .into_iter()
+                .filter(| i | i.name == label.split(" [").collect::<Vec<&str>>()[0])
+                .collect::<Vec<crate::utils::types::App>>()[0];
+
+            let args = app
+                .exec
+                .split(" ")
+                .collect::<Vec<&str>>();
+
+            Self::exec(args);
+        }
     }
 
     pub fn get_apps(path: &str) -> Vec<crate::utils::types::App> {
@@ -298,7 +324,6 @@ impl App {
                 generic: String::from(""),
                 exec: String::from(""),
                 icon: String::from(""),
-                calc: false,
             };
 
             let file_path = file
@@ -375,5 +400,13 @@ impl App {
         !text
             .bytes()
             .all(| b | matches!(b, b'A'..=b'Z'))
+    }
+
+    fn contains_number(text: &str) -> bool {
+        text
+            .trim()
+            .replace(" ", "")
+            .bytes()
+            .all(| b | matches!(b, b'.'..=b'9'))
     }
 }
