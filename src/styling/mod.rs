@@ -38,7 +38,7 @@ impl Provider {
                 border-radius: 0;
                 padding: 0;
                 background: transparent;
-                font-size: 11pt;
+                font-size: 14pt;
                 color: white;
             }}
 
@@ -47,13 +47,13 @@ impl Provider {
             }}
 
             .title {{
-                font-size: 12pt;
+                font-size: 11pt;
                 font-weight: 600;
                 color: white;
             }}
 
             .generic {{
-                font-size: 10pt;
+                font-size: 9pt;
                 font-weight: 500;
                 color: #EEE;
             }}
@@ -95,13 +95,13 @@ impl Provider {
             }}
 
             .title {{
-                font-size: 12pt;
+                font-size: 11pt;
                 font-weight: 600;
                 color: white;
             }}
 
             .generic {{
-                font-size: 10pt;
+                font-size: 9pt;
                 font-weight: 500;
                 color: #EEE;
             }}

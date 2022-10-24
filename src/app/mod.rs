@@ -50,6 +50,8 @@ impl App {
                 .title("Rough")
                 .build();
 
+            
+
             if self.config.window.opacity < 1.0 {
                 window.set_app_paintable(true);
 
@@ -81,7 +83,7 @@ impl App {
             textbox.set_margin_top(5);
             textbox.set_app_paintable(true);
             textbox.set_vexpand(true);
-            textbox.set_xalign(0.5);
+            textbox.set_xalign(0.015);
 
             if self.shell {
                 textbox.connect_key_press_event(| textbox, event | {
@@ -125,7 +127,7 @@ impl App {
             });
 
             let scrollable = ScrolledWindow::builder()
-                .hscrollbar_policy(gtk::PolicyType::Automatic)
+                .hscrollbar_policy(gtk::PolicyType::External)
                 .margin_top(self.config.list.margin_top)
                 .build();
 
@@ -205,8 +207,8 @@ impl App {
                 list.show_all();
 
                 let size = match list.children().len() as i32 {
-                    n if n <= 1 => 50,
-                    n if n <= 2 => 75,
+                    n if n <= 1 => 0,
+                    n if n <= 2 => 80,
                     n if n <= 3 => 100,
                     n if n <= 5 => 150,
                     _ => self.config.container.max_height,
@@ -257,7 +259,7 @@ impl App {
 
         let text = Box::builder()
             .orientation(Orientation::Vertical)
-            .spacing(6)
+            .spacing(5)
             .valign(Align::Start)
             .build();
         
@@ -298,6 +300,22 @@ impl App {
                 .add_class("generic");
 
             text.add(&generic);
+        
+        } else {
+            let exec = Label::new(Some(&format!("{}", &app.exec)));
+
+            exec
+                .set_halign(Align::Start);
+
+            exec
+                .style_context()
+                .add_provider(provider, gtk::STYLE_PROVIDER_PRIORITY_USER);
+
+            exec
+                .style_context()
+                .add_class("generic");
+
+            text.add(&exec);
         }
 
         container.add(&text);
