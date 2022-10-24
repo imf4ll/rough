@@ -69,7 +69,7 @@ Default template: "YOURHOME/.config/rough/config.json"
         "opacity": 1.0,
         "background_color": "0, 0, 0",
         "font_color": "#FFFFFF",
-        "icons": true
+        "font": ""
     },
     "container": {
         "max_height": 200
@@ -98,7 +98,7 @@ Default template: "YOURHOME/.config/rough/config.json"
 | opacity | If smaller than 1.0, will set a alpha on the background |
 | background_color | If transparent enabled, will be the background color (use values between 0 and 1, like "(0.40, 0.42, 0.54)") |
 | font_color | Set font color of entire application |
-| icons | Enable icons on left side |
+| font | Set font family (Give only the name, ex: '"font": Inter') |
 
 &nbsp;
 

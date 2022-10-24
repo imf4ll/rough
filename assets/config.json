@@ -6,7 +6,7 @@
         "opacity": 1.0,
         "background_color": "0, 0, 0",
         "font_color": "#FFFFFF",
-        "icons": true
+        "font": ""
     },
     "container": {
         "max_height": 200
