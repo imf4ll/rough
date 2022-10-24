@@ -74,10 +74,11 @@ impl App {
 
             textbox
                 .style_context()
-                .add_provider(&provider, gtk::STYLE_PROVIDER_PRIORITY_APPLICATION);
+                .add_provider(&provider, gtk::STYLE_PROVIDER_PRIORITY_USER);
 
             textbox.set_placeholder_text(Some("Type your command or app"));
             textbox.set_margin(self.config.textbox.margin);
+            textbox.set_margin_top(5);
             textbox.set_app_paintable(true);
             textbox.set_vexpand(true);
             textbox.set_xalign(0.5);
@@ -102,7 +103,7 @@ impl App {
 
             list
                 .style_context()
-                .add_provider(&provider, gtk::STYLE_PROVIDER_PRIORITY_APPLICATION);
+                .add_provider(&provider, gtk::STYLE_PROVIDER_PRIORITY_USER);
             
             list.connect_key_press_event(| list, event | {
                 if event.keycode() == Some(36) {
@@ -124,13 +125,12 @@ impl App {
             });
 
             let scrollable = ScrolledWindow::builder()
-                .hscrollbar_policy(gtk::PolicyType::Never)
+                .hscrollbar_policy(gtk::PolicyType::Automatic)
                 .margin_top(self.config.list.margin_top)
                 .build();
 
             let container_clone = container.clone();
             let scrollable_clone = scrollable.clone();
-            let config_clone = self.config.clone();
 
             textbox.connect_changed(move | text | {
                 if !format!("{:?}", container_clone.children()).contains("GtkScrolledWindow") {
@@ -150,13 +150,13 @@ impl App {
                         Ok(_) => {
                             let container = Box::builder()
                                 .orientation(Orientation::Horizontal)
-                                .spacing(0)
-                                .halign(Align::Center)
+                                .spacing(10)
+                                .halign(Align::Start)
                                 .build();
 
                             let image = Image::builder()
                                 .icon_name("accessories-calculator")
-                                .icon_size(IconSize::Button)
+                                .icon_size(IconSize::Dnd)
                                 .build();
 
                             container.add(&image);
@@ -168,9 +168,17 @@ impl App {
                             )
                                 .unwrap();
 
-                            container.add (
-                                &Label::new(Some(&format!("{calc}")))
-                            );
+                            let label = Label::new(Some(&format!("{calc}")));
+
+                            label
+                                .style_context()
+                                .add_provider(&provider, gtk::STYLE_PROVIDER_PRIORITY_USER);
+
+                            label
+                                .style_context()
+                                .add_class("title");
+
+                            container.add(&label);
 
                             if Self::contains_number(&format!("{calc}")) {
                                 list.add(&container);
@@ -187,7 +195,7 @@ impl App {
                         i.name.to_lowercase().contains(&format!("{}", text.text().to_lowercase())) ||
                         i.exec.contains(&format!("{}", text.text().to_lowercase()))
                     )
-                    .for_each(| i | Self::add(&i, &list, &config_clone));
+                    .for_each(| i | Self::add(&i, &list, &provider));
 
                 if text.text() == "" || list.children().len() == 0 {
                     container_clone.remove(&scrollable_clone);
@@ -197,9 +205,10 @@ impl App {
                 list.show_all();
 
                 let size = match list.children().len() as i32 {
-                    n if n <= 2 => 0,
-                    n if n <= 3 => 75,
-                    n if n <= 5 => 100,
+                    n if n <= 1 => 50,
+                    n if n <= 2 => 75,
+                    n if n <= 3 => 100,
+                    n if n <= 5 => 150,
                     _ => self.config.container.max_height,
                 };
 
@@ -210,15 +219,6 @@ impl App {
             container.add(&textbox);
             
             window.add(&container);
-
-            window.connect_focus_out_event(| window, _ | {
-                if !window.has_focus() {
-                    exit(0);
-
-                }
-
-                Inhibit(false)
-            });
 
             window.connect_key_press_event(move | _, event | {
                 if event.keycode() == Some(9) {
@@ -247,31 +247,60 @@ impl App {
         exit(0);
     }
 
-    fn add(app: &crate::utils::types::App, list: &ListBox, config: &Config) {
+    fn add(app: &crate::utils::types::App, list: &ListBox, provider: &gtk::CssProvider) {
         let container = Box::builder()
             .orientation(Orientation::Horizontal)
-            .spacing(0)
-            .halign(Align::Center)
+            .spacing(10)
+            .halign(Align::Start)
+            .valign(Align::Center)
+            .build();
+
+        let text = Box::builder()
+            .orientation(Orientation::Vertical)
+            .spacing(6)
+            .valign(Align::Start)
             .build();
         
         let image = Image::builder()
             .icon_name(&app.icon)
-            .icon_size(IconSize::Button)
+            .icon_size(IconSize::Dnd)
             .build();
 
-        let mut name = Label::new(Some(&format!("{}", &app.name)));
+        let name = Label::new(Some(&format!("{}", &app.name)));
+
+        name
+            .set_halign(Align::Start);
+
+        name
+            .style_context()
+            .add_provider(provider, gtk::STYLE_PROVIDER_PRIORITY_USER);
+
+        name
+            .style_context()
+            .add_class("title");
+
+        container.add(&image);
+
+        text.add(&name);
 
         if app.generic != "" {
-            name = Label::new(Some(&format!("{} [{}]", &app.name, &app.generic)));
-        
+            let generic = Label::new(Some(&format!("{}", &app.generic)));
+
+            generic
+                .set_halign(Align::Start);
+
+            generic
+                .style_context()
+                .add_provider(provider, gtk::STYLE_PROVIDER_PRIORITY_USER);
+
+            generic
+                .style_context()
+                .add_class("generic");
+
+            text.add(&generic);
         }
 
-        if config.window.icons {
-            container.add(&image);
-        
-        }
-
-        container.add(&name);
+        container.add(&text);
 
         list.add(&container);
     }
@@ -286,8 +315,13 @@ impl App {
             .expect("Failed to downcast")
             .children()
             .into_iter()
-            .filter(| i | format!("{:?}", i).contains("GtkLabel"))
+            .filter(| i | format!("{:?}", i).contains("GtkBox"))
             .collect::<Vec<gtk::Widget>>()[0]
+            .clone()
+            .downcast::<Box>()
+            .expect("Failed to downcast")
+            .children()[0]
+            .clone()
             .property_value("label")
             .get()
             .unwrap();

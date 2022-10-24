@@ -23,7 +23,7 @@ impl Provider {
     }
 
     fn create_transparent_css(config: &Config) -> String {
-        format!("
+        let mut css = format!("
             * {{
                 color: {};
             }}
@@ -38,19 +38,45 @@ impl Provider {
                 border-radius: 0;
                 padding: 0;
                 background: transparent;
+                font-size: 11pt;
+                color: white;
             }}
 
             list {{
                 background: transparent;
             }}
+
+            .title {{
+                font-size: 12pt;
+                font-weight: 600;
+                color: white;
+            }}
+
+            .generic {{
+                font-size: 10pt;
+                font-weight: 500;
+                color: #EEE;
+            }}
         ",
             config.window.font_color,
             config.window.border_color,
-        )
+        );
+
+        if config.window.font != "" {
+            css += &format!("
+                * {{
+                    font-family: {};
+                }}
+            ",
+                config.window.font
+            );
+        }
+
+        css
     }
 
     fn create_default_css(config: &Config) -> String {
-        format!("
+        let mut css = format!("
             * {{
                 color: {};
             }}
@@ -61,13 +87,39 @@ impl Provider {
 
             entry {{
                 border: none;
-                font-weight: 500;
+                font-weight: 600;
                 border-radius: 0;
                 padding: 0;
+                font-size: 11pt;
+                color: white;
+            }}
+
+            .title {{
+                font-size: 12pt;
+                font-weight: 600;
+                color: white;
+            }}
+
+            .generic {{
+                font-size: 10pt;
+                font-weight: 500;
+                color: #EEE;
             }}
         ",
             config.window.font_color,
             config.window.border_color,
-        )
+        );
+
+        if config.window.font != "" {
+            css += &format!("
+                * {{
+                    font-family: {};
+                }}
+            ",
+                config.window.font
+            );
+        }
+
+        css
     }
 }
