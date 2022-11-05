@@ -74,12 +74,16 @@ impl App {
                 .valign(Align::Center)
                 .build();
 
-            let search = Box::new(Orientation::Horizontal, 0);
+            let search = Box::builder()
+                .orientation(Orientation::Horizontal)
+                .spacing(0)
+                .margin(5)
+                .build();
 
             let magnifier = Image::builder()
                 .icon_name("system-search")
                 .icon_size(IconSize::Button)
-                .margin_start(10)
+                .margin_start(6)
                 .build();
 
             let textbox = Entry::new();
@@ -89,10 +93,11 @@ impl App {
                 .add_provider(&provider, gtk::STYLE_PROVIDER_PRIORITY_USER);
 
             textbox.set_placeholder_text(Some("Type your command or app"));
-            textbox.set_margin(self.config.textbox.margin);
-            textbox.set_margin_start(8);
-            textbox.set_margin_top(5);
+            textbox.set_margin(0);
+            textbox.set_margin_start(5);
+            textbox.set_margin_end(5);
             textbox.set_app_paintable(true);
+            textbox.set_hexpand(true);
             textbox.set_xalign(0.015);
 
             search.add(&magnifier);
