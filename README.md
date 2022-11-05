@@ -75,7 +75,6 @@ Default template: "YOURHOME/.config/rough/config.json"
         "max_height": 200
     },
     "textbox": {
-        "margin": 0,
         "transparent": false
     },
     "list": {
@@ -112,7 +111,6 @@ Default template: "YOURHOME/.config/rough/config.json"
 ### Textbox (Entry)
 | Option | Description |
 |--------|-------------|
-| margin | Set margin (all sides) of textbox |
 | transparent | If window opacity smaller than 1.0, receive true or false to transparency |
 
 &nbsp;
