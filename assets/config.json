@@ -12,7 +12,6 @@
         "max_height": 200
     },
     "textbox": {
-        "margin": 0,
         "transparent": false
     },
     "list": {

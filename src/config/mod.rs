@@ -25,7 +25,6 @@ pub fn parse() -> Config {
             max_height: 200,
         },
         textbox: TextBox {
-            margin: 0,
             transparent: false
         },
         list: List {

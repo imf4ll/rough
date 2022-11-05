@@ -35,7 +35,6 @@ pub struct Container {
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct TextBox {
-    pub margin: i32,
     pub transparent: bool,
 }
 
