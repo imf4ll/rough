@@ -50,8 +50,6 @@ impl App {
                 .title("Rough")
                 .build();
 
-            
-
             if self.config.window.opacity < 1.0 {
                 window.set_app_paintable(true);
 
@@ -69,8 +67,20 @@ impl App {
             window
                 .style_context()
                 .add_provider(&provider, gtk::STYLE_PROVIDER_PRIORITY_APPLICATION);
-            
-            let container = Box::new(Orientation::Vertical, 0);
+
+            let container = Box::builder()
+                .orientation(Orientation::Vertical)
+                .spacing(0)
+                .valign(Align::Center)
+                .build();
+
+            let search = Box::new(Orientation::Horizontal, 0);
+
+            let magnifier = Image::builder()
+                .icon_name("system-search")
+                .icon_size(IconSize::Button)
+                .margin_start(10)
+                .build();
 
             let textbox = Entry::new();
 
@@ -80,10 +90,13 @@ impl App {
 
             textbox.set_placeholder_text(Some("Type your command or app"));
             textbox.set_margin(self.config.textbox.margin);
+            textbox.set_margin_start(8);
             textbox.set_margin_top(5);
             textbox.set_app_paintable(true);
-            textbox.set_vexpand(true);
             textbox.set_xalign(0.015);
+
+            search.add(&magnifier);
+            search.add(&textbox);
 
             if self.shell {
                 textbox.connect_key_press_event(| textbox, event | {
@@ -218,9 +231,18 @@ impl App {
                 scrollable_clone.show_all();
             });
 
-            container.add(&textbox);
-            
+            container.add(&search);
+
             window.add(&container);
+
+            window.connect_focus_out_event(| window, _ | {
+                if !window.has_focus() {
+                    exit(0);
+
+                }
+
+                Inhibit(false)
+            });
 
             window.connect_key_press_event(move | _, event | {
                 if event.keycode() == Some(9) {
