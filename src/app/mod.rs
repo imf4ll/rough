@@ -78,6 +78,8 @@ impl App {
                 .orientation(Orientation::Horizontal)
                 .spacing(0)
                 .margin(5)
+                .margin_top(10)
+                .margin_bottom(10)
                 .build();
 
             let magnifier = Image::builder()
