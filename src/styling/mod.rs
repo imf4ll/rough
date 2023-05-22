@@ -57,6 +57,18 @@ impl Provider {
                 font-weight: 500;
                 color: #EEE;
             }}
+
+            .news-title {{
+                font-size: 10pt;
+                font-weight: 600;
+                color: #FFF;
+            }}
+
+            .news-description {{
+                font-size: 9pt;
+                font-weight: 500;
+                color: #CCC;
+            }}
         ",
             config.window.font_color,
             config.window.border_color,
@@ -104,6 +116,18 @@ impl Provider {
                 font-size: 9pt;
                 font-weight: 500;
                 color: #EEE;
+            }}
+
+            .news-title {{
+                font-size: 10pt;
+                font-weight: 600;
+                color: #FFF;
+            }}
+
+            .news-description {{
+                font-size: 9pt;
+                font-weight: 500;
+                color: #CCC;
             }}
         ",
             config.window.font_color,
