@@ -4,7 +4,7 @@
 </div>
 
 &nbsp;
-## 📜 Big update v0.2.0:
+## 📜 Major release v0.2.0:
 
 #### Introducing "modules":
 In addition of bug fixes, we bring a new system for rough, called "modules", who expands rough uses, adding some new features
