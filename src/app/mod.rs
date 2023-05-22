@@ -3,12 +3,12 @@ mod transparency;
 use std::process::{Command, exit};
 use std::fs::{read_dir, read_to_string};
 
-use gtk::prelude::*;
 use crate::utils::types::Config;
 use crate::app::transparency::*;
 use crate::styling::Provider;
-use eval::eval;
-use gtk::gdk::SELECTION_CLIPBOARD;
+use crate::modules;
+
+use gtk::prelude::*;
 use gtk::{
     Application,
     ApplicationWindow,
@@ -21,14 +21,12 @@ use gtk::{
     Image,
     IconSize,
     Align,
-    Clipboard,
 };
 
 pub struct App {
     pub app: Application,
     pub shell: bool,
     pub config: Config,
-    pub calc: bool,
 }
 
 impl App {
@@ -126,25 +124,6 @@ impl App {
             list
                 .style_context()
                 .add_provider(&provider, gtk::STYLE_PROVIDER_PRIORITY_USER);
-            
-            list.connect_key_press_event(| list, event | {
-                if event.keycode() == Some(36) {
-                    Self::select(list, &Self::get_apps("/usr/share/applications"));
-
-                }
-
-                Inhibit(false)
-            });
-
-            list.connect_button_press_event(| list, event| {
-                if event.button() == 1 {
-                    list.connect_row_selected(| list, _ | {
-                        Self::select(list, &Self::get_apps("/usr/share/applications"));
-                    });
-                }
-
-                Inhibit(false)
-            });
 
             let scrollable = ScrolledWindow::builder()
                 .hscrollbar_policy(gtk::PolicyType::External)
@@ -153,8 +132,31 @@ impl App {
 
             let container_clone = container.clone();
             let scrollable_clone = scrollable.clone();
-
+            let list_clone = list.clone();
+            let provider_clone = provider.clone();
+            
             textbox.connect_changed(move | text | {
+                if text.text().as_str() != "" {
+                    list.connect_key_press_event(| list, event | {
+                        if event.keycode() == Some(36) {
+                            Self::select(list, &Self::get_apps("/usr/share/applications"));
+
+                        }
+
+                        Inhibit(false)
+                    });
+
+                    list.connect_button_press_event(| list, event| {
+                        if event.button() == 1 {
+                            list.connect_row_selected(| list, _ | {
+                                Self::select(list, &Self::get_apps("/usr/share/applications"));
+                            });
+                        }
+
+                        Inhibit(false)
+                    });
+                }
+
                 if !format!("{:?}", container_clone.children()).contains("GtkScrolledWindow") {
                     if !format!("{:?}", scrollable_clone.children()).contains("GtkViewport") {
                         scrollable_clone.add(&list);
@@ -167,50 +169,11 @@ impl App {
 
                 list.foreach(| i | list.remove(i));
 
-                if self.calc && Self::is_calc_valid(text.text().as_str()) {
-                    match eval(text.text().as_str()) {
-                        Ok(_) => {
-                            let container = Box::builder()
-                                .orientation(Orientation::Horizontal)
-                                .spacing(10)
-                                .halign(Align::Start)
-                                .build();
-
-                            let image = Image::builder()
-                                .icon_name("accessories-calculator")
-                                .icon_size(IconSize::Dnd)
-                                .build();
-
-                            container.add(&image);
-
-                            let calc = eval (
-                                text
-                                    .text()
-                                    .as_str()
-                            )
-                                .unwrap();
-
-                            let label = Label::new(Some(&format!("{calc}")));
-
-                            label
-                                .style_context()
-                                .add_provider(&provider, gtk::STYLE_PROVIDER_PRIORITY_USER);
-
-                            label
-                                .style_context()
-                                .add_class("title");
-
-                            container.add(&label);
-
-                            if Self::contains_number(&format!("{calc}")) {
-                                list.add(&container);
-
-                            }
-                        },
-                        Err(_) => {},
-                    }
+                if self.config.modules.calc {
+                    modules::calc::calc(&text, &provider, &list);
+                
                 }
-
+                
                 Self::get_apps("/usr/share/applications")
                     .into_iter()
                     .filter(| i |
@@ -239,6 +202,17 @@ impl App {
             });
 
             container.add(&search);
+
+            let config_clone = self.config.clone();
+
+            modules::modules(
+                &config_clone,
+                &container,
+                &scrollable,
+                &textbox,
+                &list_clone,
+                &provider_clone,
+            );
 
             window.add(&container);
 
@@ -373,27 +347,18 @@ impl App {
             .get()
             .unwrap();
 
-        if Self::contains_number(&label) {
-            let clipboard = Clipboard::get(&SELECTION_CLIPBOARD);
+        let app = &apps
+            .clone()
+            .into_iter()
+            .filter(| i | i.name == label.split(" [").collect::<Vec<&str>>()[0])
+            .collect::<Vec<crate::utils::types::App>>()[0];
 
-            clipboard.set_text(&label);
+        let args = app
+            .exec
+            .split(" ")
+            .collect::<Vec<&str>>();
 
-            std::process::exit(0);
-
-        } else {
-            let app = &apps
-                .clone()
-                .into_iter()
-                .filter(| i | i.name == label.split(" [").collect::<Vec<&str>>()[0])
-                .collect::<Vec<crate::utils::types::App>>()[0];
-
-            let args = app
-                .exec
-                .split(" ")
-                .collect::<Vec<&str>>();
-
-            Self::exec(args);
-        }
+        Self::exec(args);
     }
 
     pub fn get_apps(path: &str) -> Vec<crate::utils::types::App> {
@@ -465,29 +430,5 @@ impl App {
         }
 
         apps
-    }
-
-    fn is_calc_valid(text: &str) -> bool {
-        text
-            .trim()
-            .replace(" ", "")
-            .bytes()
-            .all(| b | matches!(b, b'%'..=b'9'))
-        &&
-        !text
-            .bytes()
-            .all(| b | matches!(b, b'a'..=b'z'))
-        &&
-        !text
-            .bytes()
-            .all(| b | matches!(b, b'A'..=b'Z'))
-    }
-
-    fn contains_number(text: &str) -> bool {
-        text
-            .trim()
-            .replace(" ", "")
-            .bytes()
-            .all(| b | matches!(b, b'.'..=b'9'))
     }
 }
