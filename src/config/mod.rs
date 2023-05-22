@@ -7,7 +7,10 @@ use crate::utils::types::{
     Window,
     Container,
     TextBox,
-    List
+    List,
+    Modules,
+    Weather,
+    News,
 };
 
 pub fn parse() -> Config {
@@ -30,7 +33,24 @@ pub fn parse() -> Config {
         list: List {
             margin_top: 6,
             transparent: false
-        }
+        },
+        modules: Modules {
+            calc: true,
+            weather: Weather {
+                enable: false,
+                key: String::new(),
+                city: String::new(),
+                cache_time: 30,
+                units: String::from("metric")
+            },
+            news: News {
+                enable: false,
+                key: String::new(),
+                region: String::new(),
+                browser: String::new(),
+                cache_time: 60
+            },
+        },
     };
 
     let path = match var("HOME") {

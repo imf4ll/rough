@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Clone)]
 pub struct App {
@@ -9,15 +9,16 @@ pub struct App {
 }
 
 // CONFIGURATION
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Config {
     pub window: Window,
     pub container: Container,
     pub textbox: TextBox,
     pub list: List,
+    pub modules: Modules,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Window {
     pub width: i32,
     pub border_width: i32,
@@ -28,18 +29,43 @@ pub struct Window {
     pub font: String,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Container {
     pub max_height: i32,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TextBox {
     pub transparent: bool,
 }
 
-#[derive(Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct List {
     pub margin_top: i32,
     pub transparent: bool,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Modules {
+    pub calc: bool,
+    pub weather: Weather,
+    pub news: News,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Weather {
+    pub enable: bool,
+    pub key: String,
+    pub city: String,
+    pub cache_time: u128,
+    pub units: String
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct News {
+    pub enable: bool,
+    pub region: String,
+    pub key: String,
+    pub browser: String,
+    pub cache_time: u128,
 }
