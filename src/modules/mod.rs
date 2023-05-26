@@ -141,7 +141,8 @@ pub fn move_value(key: &String, value: bool) {
         "calc" => config.modules.calc = value,
         "weather" => config.modules.weather.enable = value,
         "news" => config.modules.news.enable = value,
-        _ => panic!("Invalid input, valid modules: calc, weather, news."),
+        "video_downloader" => config.modules.video_downloader.enable = value,
+        _ => panic!("Invalid input, valid modules: calc, weather, news, video_downloader."),
     }
 
     let mut config_file = File::create(&path)
