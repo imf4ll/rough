@@ -12,6 +12,12 @@ and purposes, like the old "calculator" who give fast access to a calculator, an
 current weather on your city and "news" who presents the last news based on your country. We are open to requests and ideas to
 news modules, feel free to open a issue.
 
+#### Update v0.2.1:
+- Some fixes on v0.2.0 major update.
+- Added "video_downloader" module, that downloads videos from Twitter, Facebook, Pinterest, Rumble and Reddit (will be added more 
+later, and the module is a fork from "rdl", a standalone project from me), just paste video link and wait for 1 or 2 seconds, a
+list will appear, just click or select with arrows and enter keys to download.
+
 &nbsp;
 ## ❗️ Install:
 
@@ -74,6 +80,7 @@ On this mode, you can run apps and shell commands directly
 - Calculator
 - Weather (OpenWeather API)
 - News (News API)
+- Video Downloader
 
 ### Setup weather module
 1. Open "config.json" and set "modules" > "weather" > "enable" to true.
@@ -98,6 +105,11 @@ On this mode, you can run apps and shell commands directly
 4. Copy your API key.
 
 5. Return to "config.json" and insert API key on "modules" > "news" > "key".
+
+### Setup video downloader
+1. Open "config.json" and set "modules" > "video_downloader" > "enable" to true.
+
+2. Set downloads location on "path" key.
 
 &nbsp;
 ## ⚙️ Configuration:
@@ -139,6 +151,10 @@ Default template: "YOURHOME/.config/rough/config.json"
             "region": "us", // ex: us, br
             "browser": "chrome", // ex: chrome, brave
             "cache_time": 60 // cache interval in minutes
+        },
+        "video_downloader": {
+            "enable": false,
+            "path": "" // Default downloads path (ex: /home/YOURHOME/Videos)
         }
     }
 }

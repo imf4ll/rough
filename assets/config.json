@@ -33,6 +33,10 @@
             "region": "",
             "browser": "",
             "cache_time": 60
+        },
+        "video_downloader": {
+            "enable": false,
+            "path": ""
         }
     }
 }
