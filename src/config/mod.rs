@@ -2,6 +2,7 @@ use std::fs::read_to_string;
 use std::env::var;
 
 use serde_json;
+
 use crate::utils::types::{
     Config,
     Window,
@@ -11,6 +12,7 @@ use crate::utils::types::{
     Modules,
     Weather,
     News,
+    VideoDownloader,
 };
 
 pub fn parse() -> Config {
@@ -50,6 +52,10 @@ pub fn parse() -> Config {
                 browser: String::new(),
                 cache_time: 60
             },
+            video_downloader: VideoDownloader {
+                enable: false,
+                path: String::new()
+            }
         },
     };
 

@@ -69,6 +69,20 @@ impl Provider {
                 font-weight: 500;
                 color: #CCC;
             }}
+
+            @keyframes download {{
+                0% {{
+                    -gtk-icon-transform: translateY(-5px);
+                }}
+
+                50% {{
+                    -gtk-icon-transform: translateY(3px);
+                }}
+            }}
+
+            .download {{
+                animation: download linear 300ms;
+            }}
         ",
             config.window.font_color,
             config.window.border_color,
@@ -128,6 +142,20 @@ impl Provider {
                 font-size: 9pt;
                 font-weight: 500;
                 color: #CCC;
+            }}
+
+            @keyframes download {{
+                0% {{
+                    -gtk-icon-transform: translateY(-5px);
+                }}
+
+                50% {{
+                    -gtk-icon-transform: translateY(3px);
+                }}
+            }}
+
+            .download {{
+                animation: download linear 300ms;
             }}
         ",
             config.window.font_color,
