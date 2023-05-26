@@ -93,7 +93,11 @@ pub fn show_modules(config: &Config) {
             Module {
                 name: String::from("\x1b[1;31m[✘] News\x1b[m"),
                 description: String::from("Shows last news.")
-            }
+            },
+            Module {
+                name: String::from("\x1b[1;31m[✘] Video Downloader\x1b[m"),
+                description: String::from("Downloads videos from Twitter, Facebook, Reddit, Rumble & Pinterest."),
+            },
         ]
     };
 
@@ -109,6 +113,11 @@ pub fn show_modules(config: &Config) {
 
     if modules.news.enable {
         list.modules[2].name = String::from("\x1b[1;32m[🗸] News\x1b[m");
+
+    }
+
+    if modules.video_downloader.enable {
+        list.modules[3].name = String::from("\x1b[1;32m[🗸] Video Downloader\x1b[m");
 
     }
 
