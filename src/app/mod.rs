@@ -76,7 +76,7 @@ impl App {
                 .orientation(Orientation::Horizontal)
                 .spacing(0)
                 .margin(5)
-                .margin_top(10)
+                .margin_top(0)
                 .margin_bottom(10)
                 .build();
 
@@ -130,15 +130,33 @@ impl App {
                 .margin_top(self.config.list.margin_top)
                 .build();
 
+            let top_bar = Box::builder()
+                .halign(Align::End)
+                .spacing(10)
+                .margin_end(10)
+                .margin_top(8)
+                .hexpand(false)
+                .build();
+
+            if self.config.modules.video_downloader.enable || self.config.modules.weather.enable {
+                container.add(&top_bar);
+
+            }
+
             let container_clone = container.clone();
             let scrollable_clone = scrollable.clone();
-            let list_clone = list.clone();
             let provider_clone = provider.clone();
+            let list_clone = list.clone();
             
             textbox.connect_changed(move | text | {
+                list.set_widget_name("apps");
+
+                list.set_halign(Align::Start);
+                list.set_width_request(self.config.window.width);
+
                 if text.text().as_str() != "" {
                     list.connect_key_press_event(| list, event | {
-                        if event.keycode() == Some(36) {
+                        if event.keycode() == Some(36) && list.widget_name() == "apps" {
                             Self::select(list, &Self::get_apps("/usr/share/applications"));
 
                         }
@@ -147,7 +165,7 @@ impl App {
                     });
 
                     list.connect_button_press_event(| list, event| {
-                        if event.button() == 1 {
+                        if event.button() == 1 && list.widget_name() == "apps" {
                             list.connect_row_selected(| list, _ | {
                                 Self::select(list, &Self::get_apps("/usr/share/applications"));
                             });
@@ -212,6 +230,7 @@ impl App {
                 &textbox,
                 &list_clone,
                 &provider_clone,
+                &top_bar,
             );
 
             window.add(&container);

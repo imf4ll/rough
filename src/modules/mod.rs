@@ -1,6 +1,7 @@
 pub mod calc;
 mod weather;
 mod news;
+mod video_downloader;
 
 use std::fs::read_to_string;
 use std::io::Write;
@@ -30,7 +31,7 @@ use gtk::{
 
 pub fn modules(
     config: &Config, container: &Box, scrollable: &ScrolledWindow,
-    textbox: &Entry, list: &ListBox, provider: &CssProvider,
+    textbox: &Entry, list: &ListBox, provider: &CssProvider, top_bar: &Box,
 ) {
     if config.modules.news.enable {
         let cfg = config.modules.news.clone();
@@ -56,9 +57,23 @@ pub fn modules(
             cfg.city,
             cfg.cache_time,
             cfg.units,
-            container,
-            provider
+            provider,
+            top_bar,
         );
+    }
+
+    if config.modules.video_downloader.enable {
+        let cfg = config.modules.video_downloader.clone();
+
+        self::video_downloader::video_downloader(
+            container,
+            textbox,
+            list,
+            scrollable,
+            cfg.path,
+            top_bar,
+            provider,
+        )
     }
 }
 

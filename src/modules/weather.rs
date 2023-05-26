@@ -33,12 +33,14 @@ pub struct Main {
     pub temp: f32
 }
 
-pub fn weather(key: String, city: String, cache_time: u128, units: String, container: &Box, provider: &CssProvider) {
+pub fn weather(
+        key: String, city: String, cache_time: u128, units: String,
+        provider: &CssProvider, top_bar: &Box,
+    ) {
     let data = cache(city, key, cache_time, units);
 
     let weather_box = Box::builder()
         .spacing(5)
-        .margin(3)
         .orientation(Orientation::Horizontal)
         .halign(Align::End)
         .build();
@@ -56,8 +58,8 @@ pub fn weather(key: String, city: String, cache_time: u128, units: String, conta
     weather_box.add(&image);
     weather_box.add(&label);
 
-    container.add(&weather_box);
-    container.show_all();
+    top_bar.add(&weather_box);
+    top_bar.show_all();
 }
 
 fn weather_icon(weather_name: &String) -> &'static str {
@@ -134,9 +136,8 @@ fn create_cache(city: String, key: String, path: String, units: String) -> Respo
 }
 
 fn get_hours() -> i64 {
-    let now = Local::now();
-
-    now.format("%H")
+    Local::now()
+        .format("%H")
         .to_string()
         .parse::<i64>()
         .expect("Failed to get hours.")

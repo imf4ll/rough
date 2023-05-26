@@ -3,6 +3,7 @@ use std::fs::{read_to_string, metadata, File};
 use std::io::Write;
 use std::env::var;
 use std::time::SystemTime;
+use std::str;
 
 use reqwest::blocking::Client;
 use serde::{Serialize, Deserialize};
@@ -62,6 +63,8 @@ fn show(
     ) {
     scrollable.set_height_request(300);
 
+    list.set_widget_name("news");
+
     list.foreach(| i | list.remove(i));
         
     for article in articles.into_iter() {
@@ -75,7 +78,18 @@ fn show(
 
         let title_text = article.title.split(" -").collect::<Vec<&str>>()[0];
 
-        let title = Label::new(Some(if title_text.len() > 100 { &title_text[..100] } else { title_text }));
+        let title = Label::new(Some(title_text));
+
+        if title_text.len() >= 90 {
+            let mut text = String::new();
+
+            title_text.split("").into_iter().for_each(| i | if text.len() < 90 {
+                text.push_str(i);
+
+            });
+
+            title.set_label(&format!("{text}..."));
+        }
 
         title
             .style_context()
@@ -111,7 +125,7 @@ fn show(
         let browser_clone = browser.clone();
     
         list.connect_key_press_event(move | list, event | {
-            if event.keycode() == Some(36) && list.children().len() == 10  {
+            if event.keycode() == Some(36) && list.widget_name() == "news" {
                 open_article(list, &browser_clone, &articles_clone);
 
             }
@@ -123,7 +137,7 @@ fn show(
         let browser_clone = browser.clone();
         
         list.connect_button_press_event(move | list, event | {
-            if event.button() == 1 && list.children().len() == 10  {
+            if event.button() == 1 && list.widget_name() == "news"  {
                 let articles_clone = articles_clone.clone();
                 let browser_clone = browser_clone.clone();
 

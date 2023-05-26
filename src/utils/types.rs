@@ -50,6 +50,7 @@ pub struct Modules {
     pub calc: bool,
     pub weather: Weather,
     pub news: News,
+    pub video_downloader: VideoDownloader,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -68,4 +69,10 @@ pub struct News {
     pub key: String,
     pub browser: String,
     pub cache_time: u128,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct VideoDownloader {
+    pub enable: bool,
+    pub path: String,
 }
