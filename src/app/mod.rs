@@ -55,10 +55,10 @@ impl App {
 
                 window.connect_screen_changed(set_visual);
                 
-                let config_clone = self.config.clone();
+                let config = self.config.clone();
 
                 window.connect_draw(move | window, ctx | {
-                    draw(window, ctx, &config_clone)
+                    draw(window, ctx, &config)
                 });
             }
 
@@ -142,94 +142,94 @@ impl App {
                 container.add(&top_bar);
 
             }
-
-            let container_clone = container.clone();
-            let scrollable_clone = scrollable.clone();
-            let provider_clone = provider.clone();
-            let list_clone = list.clone();
             
-            textbox.connect_changed(move | text | {
-                list.set_widget_name("apps");
+            textbox.connect_changed({
+                let container = container.clone();
+                let scrollable = scrollable.clone();
+                let provider = provider.clone();
+                let list = list.clone();
 
-                list.set_halign(Align::Start);
-                list.set_width_request(self.config.window.width);
+                move | text | {
+                    list.set_widget_name("apps");
 
-                if text.text().as_str() != "" {
-                    list.connect_key_press_event(| list, event | {
-                        if event.keycode() == Some(36) && list.widget_name() == "apps" {
-                            Self::select(list, &Self::get_apps("/usr/share/applications"));
+                    list.set_halign(Align::Start);
+                    list.set_width_request(self.config.window.width);
 
-                        }
-
-                        Inhibit(false)
-                    });
-
-                    list.connect_button_press_event(| list, event| {
-                        if event.button() == 1 && list.widget_name() == "apps" {
-                            list.connect_row_selected(| list, _ | {
+                    if text.text().as_str() != "" {
+                        list.connect_key_press_event(| list, event | {
+                            if event.keycode() == Some(36) && list.widget_name() == "apps" {
                                 Self::select(list, &Self::get_apps("/usr/share/applications"));
-                            });
+
+                            }
+
+                            Inhibit(false)
+                        });
+
+                        list.connect_button_press_event(| list, event| {
+                            if event.button() == 1 && list.widget_name() == "apps" {
+                                list.connect_row_selected(| list, _ | {
+                                    Self::select(list, &Self::get_apps("/usr/share/applications"));
+                                });
+                            }
+
+                            Inhibit(false)
+                        });
+                    }
+
+                    if !format!("{:?}", container.children()).contains("GtkScrolledWindow") {
+                        if !format!("{:?}", scrollable.children()).contains("GtkViewport") {
+                            scrollable.add(&list);
+
                         }
 
-                        Inhibit(false)
-                    });
-                }
+                        container.add(&scrollable);
+                        container.show_all();
+                    }
 
-                if !format!("{:?}", container_clone.children()).contains("GtkScrolledWindow") {
-                    if !format!("{:?}", scrollable_clone.children()).contains("GtkViewport") {
-                        scrollable_clone.add(&list);
+                    list.foreach(| i | list.remove(i));
+
+                    if self.config.modules.calc {
+                        modules::calc::calc(&text, &provider, &list);
+                    
+                    }
+                    
+                    Self::get_apps("/usr/share/applications")
+                        .into_iter()
+                        .filter(| i |
+                            i.name.to_lowercase().contains(&format!("{}", text.text().to_lowercase())) ||
+                            i.exec.contains(&format!("{}", text.text().to_lowercase()))
+                        )
+                        .for_each(| i | Self::add(&i, &list, &provider));
+
+                    if text.text() == "" || list.children().len() == 0 {
+                        container.remove(&scrollable);
 
                     }
 
-                    container_clone.add(&scrollable_clone);
-                    container_clone.show_all();
+                    list.show_all();
+
+                    let size = match list.children().len() as i32 {
+                        n if n <= 1 => 0,
+                        n if n <= 2 => 80,
+                        n if n <= 3 => 100,
+                        n if n <= 5 => 150,
+                        _ => self.config.container.max_height,
+                    };
+
+                    scrollable.set_height_request(size);
+                    scrollable.show_all();    
                 }
-
-                list.foreach(| i | list.remove(i));
-
-                if self.config.modules.calc {
-                    modules::calc::calc(&text, &provider, &list);
-                
-                }
-                
-                Self::get_apps("/usr/share/applications")
-                    .into_iter()
-                    .filter(| i |
-                        i.name.to_lowercase().contains(&format!("{}", text.text().to_lowercase())) ||
-                        i.exec.contains(&format!("{}", text.text().to_lowercase()))
-                    )
-                    .for_each(| i | Self::add(&i, &list, &provider));
-
-                if text.text() == "" || list.children().len() == 0 {
-                    container_clone.remove(&scrollable_clone);
-
-                }
-
-                list.show_all();
-
-                let size = match list.children().len() as i32 {
-                    n if n <= 1 => 0,
-                    n if n <= 2 => 80,
-                    n if n <= 3 => 100,
-                    n if n <= 5 => 150,
-                    _ => self.config.container.max_height,
-                };
-
-                scrollable_clone.set_height_request(size);
-                scrollable_clone.show_all();
             });
 
             container.add(&search);
 
-            let config_clone = self.config.clone();
-
             modules::modules(
-                &config_clone,
+                &self.config.clone(),
                 &container,
                 &scrollable,
                 &textbox,
-                &list_clone,
-                &provider_clone,
+                &list,
+                &provider,
                 &top_bar,
             );
 
@@ -395,8 +395,14 @@ impl App {
                 .expect("Failed to read file")
                 .path();
 
-            let content = read_to_string(file_path)
-                .expect("Failed to read file");
+            let content = match read_to_string(file_path) {
+                Ok(s) => s,
+                Err(_) => {
+                    println!("Skipping invalid entry.");
+
+                    continue;
+                },
+            };
 
             let raw_lines = content
                 .split("\n")

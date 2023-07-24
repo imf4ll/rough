@@ -31,147 +31,149 @@ pub fn video_downloader(
         scrollable: &ScrolledWindow, path: String, top_bar: &Box,
         provider: &CssProvider,
     ) {
-    let container_clone = container.clone();
-    let list_clone = list.clone();
-    let scrollable_clone = scrollable.clone();
-    let path_clone = path.clone();
-    let top_bar_clone = top_bar.clone();
-    let provider_clone = provider.clone();
+    textbox.connect_changed({
+        let container = container.clone();
+        let list = list.clone();
+        let scrollable = scrollable.clone();
+        let path = path.clone();
+        let top_bar = top_bar.clone();
+        let provider = provider.clone();
 
-    textbox.connect_changed(move | text | {
-        let url = text.text().to_string();
-        
-        let mut filename = String::new();
-        let mut qualities: Vec<types::GlobalFormat> = vec![];
-        
-        if url.contains("twitter.com") {
-            qualities = twitter::get(url);
-
-            filename = create_filename("twitter");
-
-            list_clone.set_widget_name("video_downloader");
-        
-        } else if url.contains("facebook.com") {
-            qualities = facebook::get(url);
+        move | text | {
+            let url = text.text().to_string();
             
-            filename = create_filename("facebook");
- 
-            list_clone.set_widget_name("video_downloader");
-
-        } else if url.contains("pinterest.com") {
-            qualities = pinterest::get(url);
+            let mut filename = String::new();
+            let mut qualities: Vec<types::GlobalFormat> = vec![];
             
-            filename = create_filename("pinterest");
+            if url.contains("twitter.com") {
+                qualities = twitter::get(url);
 
-            list_clone.set_widget_name("video_downloader");
-        
-        } else if url.contains("reddit.com") {
-            qualities = reddit::get(url);
+                filename = create_filename("twitter");
 
-            filename = create_filename("reddit");
-
-            list_clone.set_widget_name("video_downloader");
-
-        } else if url.contains("rumble.com") {
-            qualities = rumble::get(url);
-
-            filename = create_filename("rumble");
-
-            list_clone.set_widget_name("video_downloader");
-
-        }
-
-        if list_clone.widget_name() == "video_downloader" {
-            list_clone.foreach(| i | list_clone.remove(i));
-
-            for q in &qualities {
-                let item = Box::builder()
-                    .halign(Align::Center)
-                    .build();
-
-                let quality_label = Label::new(Some(&q.quality));
-
-                item.add(&quality_label);
-
-                list_clone.add(&item);
-            }
- 
-            let size = match list_clone.children().len() as i32 {
-                n if n <= 1 => 0,
-                n if n <= 2 => 35,
-                n if n <= 3 => 65,
-                n if n <= 5 => 85,
-                _ => 150,
-            };
-
-            scrollable_clone.set_height_request(size);
-
-            list_clone.set_halign(Align::Center);
-
-            scrollable_clone.add(&list_clone);
-
-            container_clone.add(&scrollable_clone);
-            container_clone.show_all();
-        }
-
-        list_clone.connect_key_press_event({
-            let qualities = qualities.clone();
-            let path = path_clone.clone();
-            let filename = filename.clone();
-            let container = container_clone.clone();
-            let top_bar = top_bar_clone.clone();
-            let provider = provider_clone.clone();
-
-            move | list, event | {
-                if event.keycode() == Some(36) && list.widget_name() == "video_downloader" {
-                    let index = list
-                        .selected_row()
-                        .expect("Failed to get index.")
-                        .index();
-
-                    download(
-                        qualities[index as usize].url.clone(),
-                        &path,
-                        &filename,
-                        &container,
-                        &top_bar,
-                        &provider
-                    );
-                }
+                list.set_widget_name("video_downloader");
+            
+            } else if url.contains("facebook.com") {
+                qualities = facebook::get(url);
                 
-                Inhibit(false)        
-            }
-        });
-        
-        list_clone.connect_button_press_event({
-            let qualities = qualities.clone();
-            let path = path_clone.clone();
-            let filename = filename.clone();
-            let container = container_clone.clone();
-            let top_bar = top_bar_clone.clone();
-            let provider = provider_clone.clone();
-        
-            move | list, event | {
-                if event.button() == 1 && list.widget_name() == "video_downloader"  {
-                    let index = list
-                        .selected_row()
-                        .expect("Failed to get index.")
-                        .index();
+                filename = create_filename("facebook");
+     
+                list.set_widget_name("video_downloader");
 
-                    download(
-                        qualities[index as usize].url.clone(),
-                        &path,
-                        &filename,
-                        &container,
-                        &top_bar,
-                        &provider
-                    );
+            } else if url.contains("pinterest.com") {
+                qualities = pinterest::get(url);
+                
+                filename = create_filename("pinterest");
+
+                list.set_widget_name("video_downloader");
+            
+            } else if url.contains("reddit.com") {
+                qualities = reddit::get(url);
+
+                filename = create_filename("reddit");
+
+                list.set_widget_name("video_downloader");
+
+            } else if url.contains("rumble.com") {
+                qualities = rumble::get(url);
+
+                filename = create_filename("rumble");
+
+                list.set_widget_name("video_downloader");
+
+            }
+
+            if list.widget_name() == "video_downloader" {
+                list.foreach(| i | list.remove(i));
+
+                for q in &qualities {
+                    let item = Box::builder()
+                        .halign(Align::Center)
+                        .build();
+
+                    let quality_label = Label::new(Some(&q.quality));
+
+                    item.add(&quality_label);
+
+                    list.add(&item);
                 }
+     
+                let size = match list.children().len() as i32 {
+                    n if n <= 1 => 0,
+                    n if n <= 2 => 35,
+                    n if n <= 3 => 65,
+                    n if n <= 5 => 85,
+                    _ => 150,
+                };
 
-                Inhibit(false)
+                scrollable.set_height_request(size);
+
+                list.set_halign(Align::Center);
+
+                scrollable.add(&list);
+
+                container.add(&scrollable);
+                container.show_all();
             }
-        });
-    });
+
+            list.connect_key_press_event({
+                let qualities = qualities.clone();
+                let path = path.clone();
+                let filename = filename.clone();
+                let container = container.clone();
+                let top_bar = top_bar.clone();
+                let provider = provider.clone();
+
+                move | list, event | {
+                    if event.keycode() == Some(36) && list.widget_name() == "video_downloader" {
+                        let index = list
+                            .selected_row()
+                            .expect("Failed to get index.")
+                            .index();
+
+                        download(
+                            qualities[index as usize].url.clone(),
+                            &path,
+                            &filename,
+                            &container,
+                            &top_bar,
+                            &provider
+                        );
+                    }
+                    
+                    Inhibit(false)        
+                }
+            });
+            
+            list.connect_button_press_event({
+                let qualities = qualities.clone();
+                let path = path.clone();
+                let filename = filename.clone();
+                let container = container.clone();
+                let top_bar = top_bar.clone();
+                let provider = provider.clone();
+            
+                move | list, event | {
+                    if event.button() == 1 && list.widget_name() == "video_downloader"  {
+                        let index = list
+                            .selected_row()
+                            .expect("Failed to get index.")
+                            .index();
+
+                        download(
+                            qualities[index as usize].url.clone(),
+                            &path,
+                            &filename,
+                            &container,
+                            &top_bar,
+                            &provider
+                        );
+                    }
+
+                    Inhibit(false)
+                }
+            });
+        }
+    });    
 }
 
 fn download(url: String, path: &String, filename: &String, container: &Box, top_bar: &Box, provider: &CssProvider) {

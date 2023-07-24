@@ -27,10 +27,11 @@ struct Articles {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 struct Article {
     author: String,
     title: String,
-    publishedAt: String,
+    published_at: String,
     url: String,
 }
 
@@ -42,18 +43,20 @@ pub fn news(
     let articles = cache(region, key, cache_time);
 
     show(&scrollable, &container, &articles.articles, &list, provider, String::new(), &browser);
-    
-    let scrollable_clone = scrollable.clone();
-    let container_clone = container.clone();
-    let list_clone = list.clone();
-    let provider_clone = provider.clone();
-    let browser_clone = browser.clone();
 
-    textbox.connect_changed(move | text | {
-        if text.text().as_str() == "" {
-            show(&scrollable_clone, &container_clone, &articles.articles, &list_clone, &provider_clone, text.text().to_string(), &browser_clone);
+    textbox.connect_changed({
+        let scrollable = scrollable.clone();
+        let container = container.clone();
+        let list = list.clone();
+        let provider = provider.clone();
+        let browser = browser.clone();
 
-        } 
+        move | text | {
+            if text.text().as_str() == "" {
+                show(&scrollable, &container, &articles.articles, &list, &provider, text.text().to_string(), &browser);
+
+            } 
+        }
     });
 }
 
@@ -83,10 +86,12 @@ fn show(
         if title_text.len() >= 90 {
             let mut text = String::new();
 
-            title_text.split("").into_iter().for_each(| i | if text.len() < 90 {
-                text.push_str(i);
+            title_text.split("").into_iter().for_each(| i |
+                if text.len() < 90 {
+                    text.push_str(i);
 
-            });
+                }
+            );
 
             title.set_label(&format!("{text}..."));
         }
@@ -99,7 +104,7 @@ fn show(
             .style_context()
             .add_class("news-title");
         
-        let description = Label::new(Some(&format!("{} · {}", article.author, format_time(&article.publishedAt))));
+        let description = Label::new(Some(&format!("{} · {}", article.author, format_time(&article.published_at))));
         
         description
             .style_context()
@@ -121,33 +126,39 @@ fn show(
     container.show_all();
 
     if text == "" {
-        let articles_clone = articles.clone();
-        let browser_clone = browser.clone();
-    
-        list.connect_key_press_event(move | list, event | {
-            if event.keycode() == Some(36) && list.widget_name() == "news" {
-                open_article(list, &browser_clone, &articles_clone);
+        list.connect_key_press_event({
+            let articles = articles.clone();
+            let browser = browser.clone();
 
+            move | list, event | {
+                if event.keycode() == Some(36) && list.widget_name() == "news" {
+                    open_article(list, &browser, &articles);
+
+                }
+                
+                Inhibit(false)
             }
-            
-            Inhibit(false)
         });
-
-        let articles_clone = articles.clone();
-        let browser_clone = browser.clone();
         
-        list.connect_button_press_event(move | list, event | {
-            if event.button() == 1 && list.widget_name() == "news"  {
-                let articles_clone = articles_clone.clone();
-                let browser_clone = browser_clone.clone();
+        list.connect_button_press_event({
+            let articles = articles.clone();
+            let browser = browser.clone();  
 
-                list.connect_row_selected(move | list, _ | {
-                   open_article(list, &browser_clone, &articles_clone);
+            move | list, event | {
+                if event.button() == 1 && list.widget_name() == "news"  {
+                    list.connect_row_selected({
+                        let articles = articles.clone();
+                        let browser = browser.clone();
+                        
+                        move | list, _ | {
+                            open_article(list, &browser, &articles);
 
-                });
+                        }
+                    });
+                }
+
+                Inhibit(false)
             }
-
-            Inhibit(false)
         });
     }
 }
@@ -191,7 +202,7 @@ fn cache(region: String, key: String, cache_time: u128) -> Articles {
         .expect("Failed to get timestamp.")
         .as_millis();
 
-    if (now - time) / 60000 >= cache_time {
+    if (now - time) / 120000 >= cache_time {
         return create_cache(region, key, path);
 
     }
