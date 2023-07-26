@@ -16,7 +16,9 @@
     },
     "list": {
         "margin_top": 6,
-        "transparent": false
+        "transparent": false,
+        "inline": false,
+        "icons": true
     },
     "modules": {
         "calc": true,

@@ -134,7 +134,9 @@ Default template: "YOURHOME/.config/rough/config.json"
     },
     "list": {
         "margin_top": 6,
-        "transparent": false
+        "transparent": false,
+        "inline": false,
+        "icons": true
     },
     "modules": {
         "calc": true,
@@ -197,5 +199,7 @@ Default template: "YOURHOME/.config/rough/config.json"
 |--------|-------------|
 | margin_top | Set margin-top of the list |
 | transparent | If window opacity smaller than 1.0, receive true or false to transparency |
+| inline | Set app presentation's orientation (true = Horizontal, false = Vertical) |
+| icons | Presents icons on app presentation |
 
 </div>

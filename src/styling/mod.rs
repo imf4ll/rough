@@ -38,7 +38,7 @@ impl Provider {
                 border-radius: 0;
                 padding: 0;
                 background: transparent;
-                font-size: 14pt;
+                font-size: 12pt;
                 color: white;
             }}
 
@@ -53,9 +53,9 @@ impl Provider {
             }}
 
             .generic {{
-                font-size: 9pt;
-                font-weight: 500;
-                color: #EEE;
+                font-size: 10pt;
+                font-weight: 600;
+                color: #CCC;
             }}
 
             .news-title {{
@@ -85,7 +85,8 @@ impl Provider {
             }}
         ",
             config.window.font_color,
-            config.window.border_color,
+            //config.window.border_color,
+            "#FFFFFF",
         );
 
         if config.window.font != "" {
@@ -116,8 +117,9 @@ impl Provider {
                 font-weight: 600;
                 border-radius: 0;
                 padding: 0;
-                font-size: 11pt;
+                font-size: 12pt;
                 color: white;
+                background: transparent;
             }}
 
             .title {{

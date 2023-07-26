@@ -34,7 +34,9 @@ pub fn parse() -> Config {
         },
         list: List {
             margin_top: 6,
-            transparent: false
+            transparent: false,
+            inline: false,
+            icons: true,
         },
         modules: Modules {
             calc: true,

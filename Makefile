@@ -4,4 +4,5 @@ install:
 	cp ./assets/config.json ${HOME}/.config/rough/
 
 update:
+	git pull origin master
 	cargo install --path .

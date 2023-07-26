@@ -43,6 +43,8 @@ pub struct TextBox {
 pub struct List {
     pub margin_top: i32,
     pub transparent: bool,
+    pub inline: bool,
+    pub icons: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

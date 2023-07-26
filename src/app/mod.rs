@@ -75,15 +75,9 @@ impl App {
             let search = Box::builder()
                 .orientation(Orientation::Horizontal)
                 .spacing(0)
-                .margin(5)
+                .margin(0)
                 .margin_top(0)
                 .margin_bottom(10)
-                .build();
-
-            let magnifier = Image::builder()
-                .icon_name("system-search")
-                .icon_size(IconSize::Button)
-                .margin_start(6)
                 .build();
 
             let textbox = Entry::new();
@@ -92,15 +86,14 @@ impl App {
                 .style_context()
                 .add_provider(&provider, gtk::STYLE_PROVIDER_PRIORITY_USER);
 
-            textbox.set_placeholder_text(Some("Type your command or app"));
+            textbox.set_placeholder_text(Some("Search"));
             textbox.set_margin(0);
-            textbox.set_margin_start(5);
-            textbox.set_margin_end(5);
+            textbox.set_margin_start(2);
+            textbox.set_margin_end(2);
             textbox.set_app_paintable(true);
             textbox.set_hexpand(true);
             textbox.set_xalign(0.015);
 
-            search.add(&magnifier);
             search.add(&textbox);
 
             if self.shell {
@@ -148,6 +141,7 @@ impl App {
                 let scrollable = scrollable.clone();
                 let provider = provider.clone();
                 let list = list.clone();
+                let config = self.config.clone();
 
                 move | text | {
                     list.set_widget_name("apps");
@@ -192,14 +186,14 @@ impl App {
                         modules::calc::calc(&text, &provider, &list);
                     
                     }
-                    
+
                     Self::get_apps("/usr/share/applications")
                         .into_iter()
                         .filter(| i |
                             i.name.to_lowercase().contains(&format!("{}", text.text().to_lowercase())) ||
                             i.exec.contains(&format!("{}", text.text().to_lowercase()))
                         )
-                        .for_each(| i | Self::add(&i, &list, &provider));
+                        .for_each(| i | Self::add(&config, &i, &list, &provider));
 
                     if text.text() == "" || list.children().len() == 0 {
                         container.remove(&scrollable);
@@ -207,17 +201,31 @@ impl App {
                     }
 
                     list.show_all();
+                    
+                    if config.list.inline && !config.list.icons {
+                        let size = match list.children().len() as i32 {
+                            n if n <= 1 => 0,
+                            n if n <= 2 => 40,
+                            n if n <= 3 => 70,
+                            n if n <= 5 => 100,
+                            _ => self.config.container.max_height,
+                        };
+                    
+                        scrollable.set_height_request(size);
+                    
+                    } else {
+                        let size = match list.children().len() as i32 {
+                            n if n <= 1 => 0,
+                            n if n <= 2 => 80,
+                            n if n <= 3 => 100,
+                            n if n <= 5 => 150,
+                            _ => self.config.container.max_height,
+                        };
+                    
+                        scrollable.set_height_request(size);
+                    }
 
-                    let size = match list.children().len() as i32 {
-                        n if n <= 1 => 0,
-                        n if n <= 2 => 80,
-                        n if n <= 3 => 100,
-                        n if n <= 5 => 150,
-                        _ => self.config.container.max_height,
-                    };
-
-                    scrollable.set_height_request(size);
-                    scrollable.show_all();    
+                    scrollable.show_all();
                 }
             });
 
@@ -271,23 +279,28 @@ impl App {
         exit(0);
     }
 
-    fn add(app: &crate::utils::types::App, list: &ListBox, provider: &gtk::CssProvider) {
+    fn add(config: &crate::utils::types::Config, app: &crate::utils::types::App, list: &ListBox, provider: &gtk::CssProvider) {
+        let (orientation, spacing) = {
+            if config.list.inline {
+                (Orientation::Horizontal, 1)
+            
+            } else {
+                (Orientation::Vertical, 4)
+
+            }
+        };
+
         let container = Box::builder()
             .orientation(Orientation::Horizontal)
-            .spacing(10)
+            .spacing(5)
             .halign(Align::Start)
             .valign(Align::Center)
             .build();
 
         let text = Box::builder()
-            .orientation(Orientation::Vertical)
-            .spacing(5)
+            .orientation(orientation)
+            .spacing(spacing)
             .valign(Align::Start)
-            .build();
-        
-        let image = Image::builder()
-            .icon_name(&app.icon)
-            .icon_size(IconSize::Dnd)
             .build();
 
         let name = Label::new(Some(&format!("{}", &app.name)));
@@ -303,7 +316,14 @@ impl App {
             .style_context()
             .add_class("title");
 
-        container.add(&image);
+        if config.list.icons {
+            let image = Image::builder()
+                .icon_name(&app.icon)
+                .icon_size(IconSize::Dnd)
+                .build();
+
+            container.add(&image);
+        }
 
         text.add(&name);
 
