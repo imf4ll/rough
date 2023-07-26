@@ -327,21 +327,21 @@ impl App {
 
         text.add(&name);
 
-        if app.generic != "" {
-            let generic = Label::new(Some(&format!("{}", &app.generic)));
+        if app.description != "" {
+            let description = Label::new(Some(&format!("{}", &app.description)));
 
-            generic
+            description
                 .set_halign(Align::Start);
 
-            generic
+            description
                 .style_context()
                 .add_provider(provider, gtk::STYLE_PROVIDER_PRIORITY_USER);
 
-            generic
+            description
                 .style_context()
-                .add_class("generic");
+                .add_class("description");
 
-            text.add(&generic);
+            text.add(&description);
         
         } else {
             let exec = Label::new(Some(&format!("{}", &app.exec)));
@@ -355,7 +355,7 @@ impl App {
 
             exec
                 .style_context()
-                .add_class("generic");
+                .add_class("description");
 
             text.add(&exec);
         }
@@ -406,7 +406,7 @@ impl App {
         for file in read_dir(path).expect("Failed to read directory") {
             let mut app = crate::utils::types::App {
                 name: String::from(""),
-                generic: String::from(""),
+                description: String::from(""),
                 exec: String::from(""),
                 icon: String::from(""),
             };
@@ -439,7 +439,13 @@ impl App {
                 }
 
                 if i.starts_with("GenericName=") {
-                    app.generic = i
+                    app.description = i
+                        .split("=")
+                        .collect::<Vec<&str>>()[1]
+                        .to_string();
+                
+                } else if i.starts_with("Comment=") && app.description == "" {
+                    app.description = i
                         .split("=")
                         .collect::<Vec<&str>>()[1]
                         .to_string();

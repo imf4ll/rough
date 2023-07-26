@@ -52,7 +52,7 @@ impl Provider {
                 color: white;
             }}
 
-            .generic {{
+            .description {{
                 font-size: 10pt;
                 font-weight: 600;
                 color: #CCC;
@@ -128,7 +128,7 @@ impl Provider {
                 color: white;
             }}
 
-            .generic {{
+            .description {{
                 font-size: 9pt;
                 font-weight: 500;
                 color: #EEE;

@@ -3,7 +3,7 @@ use serde::{Serialize, Deserialize};
 #[derive(Debug, Clone)]
 pub struct App {
     pub name: String,
-    pub generic: String,
+    pub description: String,
     pub exec: String,
     pub icon: String,
 }
